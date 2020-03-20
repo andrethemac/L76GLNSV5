@@ -4,6 +4,7 @@
 # andre@andrethemac.be
 # v4 2018-03-24
 # v6 converted to threading model to read messages
+# v7 fix for longer messages on newer L76 chips (v4.10)
 # based upon the original L76GLNSS library
 # and the modifications by neuromystix
 # every lookup of coordinates or other GPS data has to wait for the
@@ -146,6 +147,8 @@ class L76GNSS:
             sentence.append('N')
         keywords = ['NMEA', 'UTCTime', 'dataValid', 'Latitude', 'NS', 'Longitude', 'EW',
                     'Speed', 'COG', 'Date', '', '', 'PositioningMode']
+        if len(sentence) > len(keywords):
+            keywords.append('NavigationaalStatus')
         self.RMC = self._mixhash(keywords, sentence)
         self.RMC['lastmessage'] = time.gmtime()
         try:
@@ -180,6 +183,8 @@ class L76GNSS:
                     'SatelliteUsed07', 'SatelliteUsed08', 'SatelliteUsed09',
                     'SatelliteUsed10', 'SatelliteUsed11', 'SatelliteUsed12',
                     'PDOP', 'HDOP', 'VDOP']
+        if len(sentence) > len(keywords):
+            keywords.append('GNSSSystemID')
         self.GSA = self._mixhash(keywords, sentence)
         self.GSA['lastmessage'] = time.gmtime()
         # try:
@@ -197,6 +202,8 @@ class L76GNSS:
                     'SatelliteID2', 'Elevation2', 'Azimuth2', 'SNR2',
                     'SatelliteID3', 'Elevation3', 'Azimuth3', 'SNR3',
                     'SatelliteID4', 'Elevation4', 'Azimuth4', 'SNR4']
+        if len(sentence) > len(keywords):
+            keywords.append('SignalID')
         self.GSV = self._mixhash(keywords, sentence)
         self.GSV['lastmessage'] = time.gmtime()
         return self.GSV
